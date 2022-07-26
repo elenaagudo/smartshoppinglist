@@ -1,0 +1,21 @@
+# En esta solución hay tres proyectos
+1- Back
+2- Data
+3- Service
+
+# Las migraciones se guardan en Data, pero la cadena de conexión está en appsettings.json que está en Back
+# En el Startup.cs de Back se añade el DbContext (que está en Data) y se le pasa la cadena de conexión (que está en Back) con esta línea:
+services.AddDbContext<ApplicationContext>(options => options.UseMySQL(Configuration.GetConnectionString("DefaultConnection")));
+
+# Para poder usar la cadena de conexión de appsettings.json y tener la capa de datos separada, los comandos de las migraciones varían un poco,
+# Hay que indicar la ruta del proyecto donde se van a guardar las migraciones y la ruta del proyecto que tiene el Startup.cs
+
+# añadir migración:
+dotnet ef migrations add initial --project "ruta\proyecto\data\archivo.csproj" --startup-project "ruta\proyecto\back\archivo.csproj"
+ejemplo:
+dotnet ef migrations add initial --project "C:\projects\ZProject\Data\Data.csproj" --startup-project "C:\projects\ZProject\Back\Back.csproj"
+
+# actualizar la base de datos:
+dotnet ef database update --project "ruta\proyecto\data\archivo.csproj" --startup-project "ruta\proyecto\back\archivo.csproj"
+ejemplo:
+dotnet ef database update --project "C:\projects\ZProject\Data\Data.csproj" --startup-project "C:\projects\ZProject\Back\Back.csproj"

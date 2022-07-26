@@ -1,0 +1,60 @@
+﻿@{
+    Layout = null;
+}
+<!doctype html>
+<html class="fixed">
+<head>
+    <title>Airlan Tracker</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Airlan Tracker">
+    <meta name="author" content="okler.net">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="~/Scripts/vendor/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/animate/animate.compat.css">
+
+    <link rel="stylesheet" href="~/Scripts/vendor/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/boxicons/css/boxicons.min.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/magnific-popup/magnific-popup.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/jquery-ui/jquery-ui.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/jquery-ui/jquery-ui.theme.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/bootstrap-multiselect/css/bootstrap-multiselect.css" />
+    <link rel="stylesheet" href="~/Scripts/vendor/morris/morris.css" />
+    <link rel="stylesheet" href="~/Scripts/css/theme.css" />
+
+    <link rel="stylesheet" href="~/Scripts/css/custom.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="~/Scripts/vendor/modernizr/modernizr.js"></script>
+    <script src="~/Scripts/master/style-switcher/style.switcher.localstorage.js"></script>
+
+    @RenderSection("CSS", required: false)
+
+</head>
+<body>
+
+    <section class="body-sign">
+        <div class="center-sign">
+            <a href="#" class="logo float-left">
+                <img src="~/img/logo-innotu.png" height="40" alt="logo-innotu" />
+            </a>
+
+            <div class="panel card-sign">
+                <div class="card-title-sign mt-3 text-right">
+                    <h2 class="title text-uppercase font-weight-bold m-0"><i class="bx bx-user-circle mr-1 text-6 position-relative top-5"></i> Sign In</h2>
+                </div>
+                <div class="card-body">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</body>
+</html>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/js/site.js"></script>
+@RenderSection("Scripts", required: false)

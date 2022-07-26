@@ -1,0 +1,133 @@
+﻿@model IEnumerable<Data.Models.Product>
+@{
+    ViewData["Title"] = "Productos";
+}
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-sm-12 col-lg-3">
+            <section class="card card-modern">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@item.Name</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            @item.DisplayName
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend" id="remove-product-@item.Id">
+                                        <button class="btn btn-sm btn-danger" type="button"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                    <input type="text" class="form-control text-center" value="1" id="product-value-@item.Id">
+                                    <div class="input-group-append" id="add-product-@item.Id">
+                                        <button class="btn btn-sm btn-success" type="button"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary btn-icon-text" id="add-to-list-@item.Id">
+                                <i class="fa fa-shopping-cart btn-icon-prepend"></i>
+                                Añadir a la lista
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/izi-toast/js/iziToast.min.js" type="text/javascript"></script>
+    <script>
+        let myTimeout;
+
+        $(document).ready(function () {
+            $("[id^='add-product-']").on("click", function (e) {
+                var strArray = $(this).attr("id").split("-");
+                var productid = strArray[2];
+
+                var previousValue = parseInt($("#product-value-" + productid).val());
+                $("#product-value-" + productid).val(previousValue + 1);
+            });
+
+            $("[id^='add-to-list-']").on("click", function (e) {
+                var strArray = $(this).attr("id").split("-");
+                var productid = strArray[3];
+
+                var productValue = parseInt($("#product-value-" + productid).val());
+
+                $.ajax({
+                    url: "@Url.Action("AddProduct","ShoppingList")",
+                    type: "POST",
+                    data: { id: productid, value: productValue },
+                    success: function (response) {
+                        // notificacion
+                        iziToast.show({
+                            //title: 'Hey',
+                            message: 'Producto añadido',
+                            theme: 'dark',
+                            layout: 2,
+                            icon: 'fa fa-check',
+                            position: 'topRight',
+                            pauseOnHover: false,
+                            drag: false,
+                            closeOnClick: true,
+                            progressBarColor: 'white',
+                            timeout: 3000
+                        });
+
+                        stopTimeout();
+                        Swal.close();
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        Swal.fire(
+                            "Algo ha ido mal",
+                            "No se ha podido borrar el producto",
+                            'error'
+                        )
+                    },
+                    beforeSend: function () {
+                        myTimeout = setTimeout(addingProduct, 1500);
+                    }
+                });
+            });
+        });
+
+        function addingProduct() {
+            Swal.fire({
+                title: 'Añadiendo...',
+                html: 'Se esta añadiendo el producto a la lista',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        function stopTimeout() {
+            clearTimeout(myTimeout);
+        }
+
+
+       $("#menu-products").attr("aria-expanded", true);
+       $("#products").addClass("show");
+       $("#menu-products").addClass("custom-active");
+
+        var activeRoom = "@ViewBag.room";
+
+        if (activeRoom > 0 ) {
+            $("#" + activeRoom).addClass("custom-active");
+        }
+        else {
+            $("#all-products").addClass("custom-active");
+        }
+    </script>
+}

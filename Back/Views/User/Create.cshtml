@@ -1,0 +1,120 @@
+﻿@model Data.Models.User
+
+@{
+    ViewData["Title"] = Back.Resources.User.Resource.NewUser;
+}
+
+<form id="UserCreateForm" asp-action="Create" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="card card-modern h-100">
+                <header class="card-header">
+                    <h2 class="card-title">@Back.Resources.User.Resource.NewUserData</h2>
+                </header>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="validation-message">
+                                <ul></ul>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <label for="Username" class="col-sm-3 control-label pt-2">@Back.Resources.User.Resource.Username<span class="required">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input asp-for="Username" class="form-control" autocomplete="new-text" required title="@Back.Resources.User.Resource.RequiredUsername">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <label for="Password" class="col-sm-3 control-label pt-2">@Back.Resources.User.Resource.Password<span class="required">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input asp-for="Password" type="password" class="form-control" autocomplete="new-text" required title="@Back.Resources.User.Resource.RequiredPassword">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <div class="col-lg-5"></div>
+                                        <input id="btnsubmit" type="button" class="btn btn-success col-lg-2" value="@Back.Resources.Actions.Resource.Save" />
+                                        <div class="col-lg-5"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+
+        // strings
+        var strUserSaved = "@Back.Resources.User.Resource.UserSaved";
+        var strSomethingWrong = "@Back.Resources.Actions.Resource.SomethingWrong";
+
+
+        jQuery.validator.setDefaults({
+            debug: true,
+            success: "valid",
+            ignore: []
+        });
+
+        var $summaryForm = $("#UserCreateForm");
+        $summaryForm.validate({
+            errorContainer: $summaryForm.find('div.validation-message'),
+            errorLabelContainer: $summaryForm.find('div.validation-message ul'),
+            wrapper: "li"
+        });
+
+
+        $("#btnsubmit").click(function () {
+            if ($summaryForm.valid()) {
+                var form = $('#UserCreateForm');
+                var formData = new FormData(form[0]);
+
+                $.ajax({
+                    url: "@Url.Action("Create", "User")",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        Swal.fire({
+                            title: strUserSaved,
+                            icon: "success",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.href = "@Url.Action("Index", "User")";
+                            }
+                        });
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        Swal.fire({
+                            title: strSomethingWrong,
+                            icon: 'error'
+                        });
+                    }
+
+                });
+            }
+        });
+
+        $("#menu-administration").addClass("nav-expanded");
+        $("#menu-administration").addClass("nav-active");
+        $("#menu-user").addClass("nav-expanded");
+        $("#menu-user").addClass("nav-active");
+        $("#menu-user-new").addClass("nav-active");
+    </script>
+}

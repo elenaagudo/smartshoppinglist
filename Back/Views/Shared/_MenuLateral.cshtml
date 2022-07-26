@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Http
+@model dynamic
+@{
+    Layout = null;
+}
+
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("Index", "Home")" id="menu-home">
+                <i class="typcn typcn-home-outline menu-icon"></i>
+                <span class="menu-title">Inicio</span>
+            </a>
+        </li>
+
+        @await Component.InvokeAsync("MenuProduct")
+
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#administration" aria-expanded="false" aria-controls="ui-basic" id="menu-administration">
+                <i class="typcn typcn-cog-outline menu-icon"></i>
+                <span class="menu-title">Administración</span>
+                <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="administration">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item"> <a class="nav-link" id="rooms" href="@Url.Action("Index", "Room")">Estancias</a></li>
+                    <li class="nav-item"> <a class="nav-link" id="supermarkets" href="@Url.Action("Index", "Supermarket")">Supermercados</a></li>
+                    <li class="nav-item"> <a class="nav-link" id="administration-products" href="@Url.Action("Index", "Product")">Productos</a></li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,75 @@
+﻿@model Data.Models.Supermarket
+
+@{
+    ViewData["Title"] = "Editar supermercado";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <section class="card card-modern h-100">
+            <div class="card-body">
+                <h4 class="card-title">Editar datos del supermercado</h4>
+                <form id="EditForm" asp-action="Edit" enctype="multipart/form-data" class="forms-sample">
+                    <div class="form-group">
+                        <label for="Name">Nombre del supermercado<span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control" required title="Completa este campo">
+                    </div>
+
+                    <button id="btnsubmit" type="button" class="btn btn-primary mr-2">Guardar</button>
+                    <button id="return" type="button" class="btn btn-secondary mr-2">Volver</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#btnsubmit").click(function () {
+            var form = $('#EditForm');
+            var formData = new FormData(form[0]);
+
+            $.ajax({
+                url: "@Url.Action("Edit", "Supermarket")",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    Swal.fire({
+                        title: "¡Cambios guardados!",
+                        icon: "success",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.href = "@Url.Action("Index", "Supermarket")";
+                        }
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (xhr.status == 409) {
+                        Swal.fire({
+                            title: "Ya existe un supermercado con ese nombre",
+                            icon: 'error'
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: "Algo ha ido mal",
+                            html: "No se ha podido guardar el supermercado",
+                            icon: 'error'
+                        });
+                    }
+                }
+            });
+        });
+
+        $("#return").on('click', function () {
+            location.href = "@Url.Action("Index", "Supermarket")";
+        });
+
+        $("#menu-administration").attr("aria-expanded", true);
+        $("#administration").addClass("show");
+        $("#menu-administration").addClass("custom-active");
+        $("#supermarkets").addClass("custom-active");
+    </script>
+}

@@ -1,0 +1,150 @@
+﻿@model IEnumerable<Data.Models.User>
+@using System.Threading
+@{
+    ViewData["Title"] = Back.Resources.User.Resource.Users;
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <section class="card card-modern">
+            <header class="card-header">
+                <h2 class="card-title">@Back.Resources.User.Resource.Users</h2>
+            </header>
+
+            <div class="card-body">
+                <table class="table table-sm table-bordered mb-0" id="user-table" data-plugin-options='{"searchPlaceholder": "@Back.Resources.Actions.Resource.Search"}'>
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName(Back.Resources.User.Resource.Username)
+                            </th>
+                            <th>
+                                @Html.DisplayName(Back.Resources.User.Resource.Password)
+                            </th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Username)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Password)
+                                </td>
+                                <td class="actions center">
+                                    <a asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a>
+                                </td>
+                                <td class="actions center">
+                                    <a class="remove-user cur-pointer text-danger" name="remove-user-@item.Id"><i class="far fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/vendor/datatables/media/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // strings
+            var strDeleteUser = "@Back.Resources.User.Resource.DeleteUser";
+            var strUserDeleted = "@Back.Resources.User.Resource.UserDeleted";
+            var strUserNotDeleted = "@Back.Resources.User.Resource.UserNotDeleted";
+            var strUserNotFound = "@Back.Resources.User.Resource.UserNotFound";
+
+            var strSomethingWrong = "@Back.Resources.Actions.Resource.SomethingWrong";
+            var strCareful = "@Back.Resources.Actions.Resource.Careful";
+            var strDeleteIt = "@Back.Resources.Actions.Resource.DeleteIt";
+            var strCancel = "@Back.Resources.Actions.Resource.Cancel";
+
+            // inicializar datatable
+            var lang = "@Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName";
+            $('#user-table').dataTable({
+                dom: '<"row align-items-center"<"col-lg-6"l><"col-lg-6"f>><"table-responsive"t><"row align-items-center"<"col-lg-6"i><"col-lg-6"p>>',
+                "language": {
+                    "url": "../../Scripts/vendor/datatables/languages/" + lang + ".json",
+                }
+            });
+
+            $("[name^='remove-user-']").on("click", function (e) {
+                var strArray = $(this).attr("name").split("-");
+                var userid = strArray[2];
+
+                // se crea para que pueda entrar en el metodo "DeleteConfirmed", porque al no ser un form no genera el token
+                // se lo pasamos por ajax con el resto de datos
+                // este metodo Html.AntiforgetyToken() crea un input hidden, cogemos el value del input generado
+                var tokeninput = '@Html.AntiForgeryToken()';
+                var token = $(tokeninput).val();
+
+                $.ajax({
+                    url: "@Url.Action("Delete","User")",
+                    type: "GET",
+                    data: { id: userid },
+                    success: function (response) {
+                        Swal.fire({
+                            title: strDeleteUser,
+                            html: "<b>" + response.username + "</b><br/>" + strCareful,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: strDeleteIt,
+                            cancelButtonText: strCancel
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "@Url.Action("DeleteConfirmed","User")",
+                                    type: "POST",
+                                    data: { __RequestVerificationToken: token, id: userid }, // aqui se pasa el token
+                                    success: function (response) {
+                                        Swal.fire({
+                                            title: strUserDeleted,
+                                            icon: 'success'
+                                        }).then((r) => {
+                                            if (r.isConfirmed) {
+                                                location.reload();
+                                            }
+                                        });
+                                    },
+                                    error: function (xhr, textStatus, errorThrown) {
+                                        Swal.fire(
+                                            strSomethingWrong,
+                                            strUserNotDeleted,
+                                            'error'
+                                        )
+                                    }
+                                });
+                            }
+                        });
+
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        Swal.fire(
+                            strSomethingWrong,
+                            strUserNotFound,
+                            'error'
+                        )
+
+                    }
+
+                });
+            });
+
+            $("#menu-administration").addClass("nav-expanded");
+            $("#menu-administration").addClass("nav-active");
+            $("#menu-user").addClass("nav-expanded");
+            $("#menu-user").addClass("nav-active");
+            $("#menu-user-list").addClass("nav-active");
+
+        });
+    </script>
+}

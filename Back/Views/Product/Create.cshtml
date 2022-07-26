@@ -1,0 +1,91 @@
+﻿@model Data.Models.Product
+
+@{
+    ViewData["Title"] = "Nuevo producto";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <section class="card card-modern h-100">
+            <div class="card-body">
+                <h4 class="card-title">Datos del nuevo supermercado</h4>
+                <form id="CreateForm" asp-action="Create" enctype="multipart/form-data" class="forms-sample">
+                    <div class="form-group">
+                        <label for="Name">Nombre del producto<span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control" required title="Completa este campo">
+                    </div>
+                    <div class="form-group">
+                        <label for="Description">Descripción</label>
+                        <input asp-for="Description" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="DisplayName">Nombre que se va a mostrar en la lista de la compra<span class="text-danger">*</span></label>
+                        <input asp-for="DisplayName" class="form-control" required title="Completa este campo">
+                    </div>
+                    <div class="form-group">
+                        <label for="Supermarket.Id">Supermercado donde se compra<span class="text-danger">*</span></label>
+                        @Html.DropDownList("Supermarket.Id", (IEnumerable<SelectListItem>)ViewBag.supermarkets, htmlAttributes: new { @class = "form-control", @required = true, @title = "Completa este campo" })
+                    </div>
+                    <div class="form-group">
+                        <label for="Room.Id">Estancia donde se guarda<span class="text-danger">*</span></label>
+                        @Html.DropDownList("Room.Id", (IEnumerable<SelectListItem>)ViewBag.rooms, htmlAttributes: new { @class = "form-control", @required = true, @title = "Completa este campo" })
+                    </div>
+
+                    <button id="btnsubmit" type="button" class="btn btn-primary mr-2">Guardar</button>
+                    <button id="return" type="button" class="btn btn-secondary mr-2">Volver</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#btnsubmit").click(function () {
+            var form = $('#CreateForm');
+            var formData = new FormData(form[0]);
+
+            $.ajax({
+                url: "@Url.Action("Create", "Product")",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    Swal.fire({
+                        title: "¡Producto guardado!",
+                        icon: "success",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.href = "@Url.Action("Index", "Product")";
+                        }
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (xhr.status == 409) {
+                        Swal.fire({
+                            title: "Ya existe un producto con ese nombre",
+                            icon: 'error'
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: "Algo ha ido mal",
+                            html: "No se ha podido guardar el producto",
+                            icon: 'error'
+                        });
+                    }
+                }
+            });
+        });
+
+        $("#return").on('click', function () {
+            location.href = "@Url.Action("Index", "Product")";
+        });
+
+        $("#menu-administration").attr("aria-expanded", true);
+        $("#administration").addClass("show");
+        $("#menu-administration").addClass("custom-active");
+        $("#administration-products").addClass("custom-active");
+    </script>
+}

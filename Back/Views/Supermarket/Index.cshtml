@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Data.Models.Supermarket>
+@{
+    ViewData["Title"] = "Supermercados";
+}
+<div class="row mb-3 text-right">
+    <div class="col-lg-12">
+        <button type="button" class="btn btn-primary btn-icon-text" onclick="window.location.href='@Url.Action("Create", "Supermarket")'">
+            <i class="fa fa-plus btn-icon-prepend"></i>
+            Nuevo supermercado
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <section class="card card-modern">
+            <div class="card-body">
+                <h4 class="card-title">Supermercados</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Nombre del supermercado
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="Edit" asp-route-id="@item.Id"><i class="fa fa-edit"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="remove-item text-danger" name="remove-item-@item.Id"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("[name^='remove-item-']").on("click", function (e) {
+                var strArray = $(this).attr("name").split("-");
+                var itemid = strArray[2];
+
+                // se crea para que pueda entrar en el metodo "DeleteConfirmed", porque al no ser un form no genera el token
+                // se lo pasamos por ajax con el resto de datos
+                // este metodo Html.AntiforgetyToken() crea un input hidden, cogemos el value del input generado
+                var tokeninput = '@Html.AntiForgeryToken()';
+                var token = $(tokeninput).val();
+
+                $.ajax({
+                    url: "@Url.Action("Delete","Supermarket")",
+                    type: "GET",
+                    data: { id: itemid },
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Vas a borrar un supermercado",
+                            html: "<b>" + response.name + "</b><br/>¡Ten cuidado! Esta acción no se puede deshacer",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "¡Si! Quiero borrarlo",
+                            cancelButtonText: "No, no lo borres"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "@Url.Action("DeleteConfirmed","Supermarket")",
+                                    type: "POST",
+                                    data: { __RequestVerificationToken: token, id: itemid }, // aqui se pasa el token
+                                    success: function (response) {
+                                        Swal.fire({
+                                            title: "¡Supermercado borrado!",
+                                            icon: 'success'
+                                        }).then((r) => {
+                                            if (r.isConfirmed) {
+                                                location.reload();
+                                            }
+                                        });
+                                    },
+                                    error: function (xhr, textStatus, errorThrown) {
+                                        Swal.fire(
+                                            "Algo ha ido mal",
+                                            "No se ha podido borrar el supermercado",
+                                            'error'
+                                        )
+                                    }
+                                });
+                            }
+                        });
+
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        Swal.fire(
+                            "Algo ha ido mal",
+                            "No hemos encontrado el supermercado",
+                            'error'
+                        )
+
+                    }
+
+                });
+            });
+
+            $("#menu-administration").attr("aria-expanded", true);
+            $("#administration").addClass("show");
+            $("#menu-administration").addClass("custom-active");
+            $("#supermarkets").addClass("custom-active");
+        });
+    </script>
+}

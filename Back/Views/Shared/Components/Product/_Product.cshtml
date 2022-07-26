@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Data.Models.Room>
+
+<li class="nav-item">
+    <a class="nav-link" data-toggle="collapse" href="#products" aria-expanded="false" aria-controls="ui-basic" id="menu-products">
+        <i class="typcn typcn-th-small-outline menu-icon"></i>
+        <span class="menu-title">Productos</span>
+        <i class="menu-arrow"></i>
+    </a>
+    <div class="collapse" id="products">
+        <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("GetProducts", "Product")" id="all-products">Todos los productos</a>
+            </li>
+            @foreach (var room in Model)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("GetProducts", "Product", new { room = room.Id })" id="@room.Id">@room.Name</a>
+                </li>
+            }
+        </ul>
+    </div>
+</li>

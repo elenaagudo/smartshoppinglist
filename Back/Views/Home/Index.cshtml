@@ -1,0 +1,91 @@
+﻿@model IEnumerable<Data.Models.ShoppingList>
+@{
+    ViewData["Title"] = "Inicio";
+}
+<div class="row mb-3 text-right">
+    <div class="col-lg-12">
+        @*Al hacer click en nueva lista mostrar swal*@
+        <button type="button" class="btn btn-primary btn-icon-text" id="new-shopping-list">
+            <i class="fa fa-plus btn-icon-prepend"></i>
+            Nueva lista de la compra
+        </button>
+    </div>
+</div>
+
+
+<div class="row">
+    @if (Model.Count() <= 0)
+    {
+        <div class="col-sm-12 col-lg-12">
+            <section class="card card-modern">
+                <div class="card-body">
+                    <h4 class="card-title">Tus últimas listas de la compra</h4>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p>No tienes ninguna lista de la compra reciente</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-sm-12 col-lg-3">
+                <section class="card card-modern">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">@item.CreateDate</h4>
+                        <div class="row">
+                            @foreach (var listProduct in item.ListProducts)
+                            {
+                                <div class="col-10">
+                                    <p>@listProduct.Product.Name</p>
+                                </div>
+
+                                <div class="col-2">
+                                    <p>@listProduct.Quantity</p>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary btn-icon-text" id="add-to-list-@item.Id">
+                                    <i class="fa fa-shopping-cart btn-icon-prepend"></i>
+                                    Añadir a la lista
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        }
+    }
+
+
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#new-shopping-list").on("click", function (e) {
+                // consulta ajax para recuperar la vista que va a ir en html
+                // mostrar showLoading
+                // en la funcion didOpen hacer otra peticion ajax para recuperar el código (readonly) de la nueva lista de la compra, 
+                // la lista de supermercados
+                // cuando esta peticion ajax responda, hideLoading y rellenar datos
+                Swal.fire({
+                    title: "Nueva lista de la compra",
+                    html: "",
+                    showCancelButton: true,
+                    confirmButtonText: "Guardar",
+                    cancelButtonText: "Cancelar"
+                });
+            });
+
+            $("#menu-home").addClass("custom-active");
+        });
+    </script>
+}
