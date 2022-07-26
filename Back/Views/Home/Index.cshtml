@@ -36,7 +36,7 @@
             <div class="col-sm-12 col-lg-3">
                 <section class="card card-modern">
                     <div class="card-body text-center">
-                        <h4 class="card-title">@item.CreateDate</h4>
+                        <h4 class="card-title">@item.Supermarket.Name</h4>
                         <div class="row">
                             @foreach (var listProduct in item.ListProducts)
                             {
@@ -50,14 +50,14 @@
                             }
                         </div>
 
-                        <div class="row mt-2">
+                        @*<div class="row mt-2">
                             <div class="col-12">
                                 <button type="button" class="btn btn-primary btn-icon-text" id="add-to-list-@item.Id">
                                     <i class="fa fa-shopping-cart btn-icon-prepend"></i>
                                     Añadir a la lista
                                 </button>
                             </div>
-                        </div>
+                        </div>*@
                     </div>
                 </section>
             </div>
@@ -73,15 +73,55 @@
             $("#new-shopping-list").on("click", function (e) {
                 // consulta ajax para recuperar la vista que va a ir en html
                 // mostrar showLoading
-                // en la funcion didOpen hacer otra peticion ajax para recuperar el código (readonly) de la nueva lista de la compra, 
+                // en la funcion didOpen hacer otra peticion ajax para recuperar el código (readonly) de la nueva lista de la compra,
                 // la lista de supermercados
                 // cuando esta peticion ajax responda, hideLoading y rellenar datos
-                Swal.fire({
-                    title: "Nueva lista de la compra",
-                    html: "",
-                    showCancelButton: true,
-                    confirmButtonText: "Guardar",
-                    cancelButtonText: "Cancelar"
+                $.ajax({
+                    url: "@Url.Action("Create","Home")",
+                    type: "GET",
+                    success: function (response) {
+                        console.log(response);
+                        Swal.fire({
+                            title: "Nueva lista de la compra",
+                            input: 'select',
+                            inputOptions: response,
+                            showCancelButton: true,
+                            confirmButtonText: "Guardar",
+                            cancelButtonText: "Cancelar",
+                            preConfirm: (supermarketid) => {
+                                $.ajax({
+                                    url: "@Url.Action("Create","Home")",
+                                    type: "POST",
+                                    data: { id: supermarketid },
+                                    success: function (response) {
+                                        Swal.fire({
+                                            title: "Lista de la compra creada",
+                                            html: response,
+                                            icon: 'success',
+                                            showCancelButton: false,
+                                            confirmButtonText: "Ok"
+                                        }).then((r) => {
+                                            location.reload();
+                                        });
+                                    },
+                                    error: function (xhr, textStatus, errorThrown) {
+                                        Swal.fire(
+                                            "Algo ha ido mal",
+                                            "No hemos encontrado la estancia",
+                                            'error'
+                                        );
+                                    }
+                                });
+                            },
+                        });
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        Swal.fire(
+                            "Algo ha ido mal",
+                            "No hemos encontrado la estancia",
+                            'error'
+                        );
+                    }
                 });
             });
 
