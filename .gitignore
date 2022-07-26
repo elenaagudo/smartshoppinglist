@@ -5,7 +5,7 @@
 
 # BACK
 .vs
-#*.sln
+*.sln
 Back/AppData
 Back/bin
 Back/obj
