@@ -38,26 +38,43 @@
                     <div class="card-body text-center">
                         <h4 class="card-title">@item.Supermarket.Name</h4>
                         <div class="row">
-                            @foreach (var listProduct in item.ListProducts)
+                            <div class="col-12">
+                                @item.CreateDate
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (item.ListProducts.Count == 0)
                             {
-                                <div class="col-10">
-                                    <p>@listProduct.Product.Name</p>
+                                <div class="col-12">
+                                    <p>No hay ningún producto</p>
                                 </div>
+                                <div class="col-12">
+                                    <a href="@Url.Action("GetProducts", "Product")"><i class="fa fa-plus-circle fa-2x text-primary"></i></a>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var listProduct in item.ListProducts)
+                                {
+                                    <div class="col-10">
+                                        <p>@listProduct.Product.Name</p>
+                                    </div>
 
-                                <div class="col-2">
-                                    <p>@listProduct.Quantity</p>
-                                </div>
+                                    <div class="col-2">
+                                        <p>@listProduct.Quantity</p>
+                                    </div>
+                                }
                             }
                         </div>
 
                         @*<div class="row mt-2">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-primary btn-icon-text" id="add-to-list-@item.Id">
-                                    <i class="fa fa-shopping-cart btn-icon-prepend"></i>
-                                    Añadir a la lista
-                                </button>
-                            </div>
-                        </div>*@
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary btn-icon-text" id="add-to-list-@item.Id">
+                                        <i class="fa fa-shopping-cart btn-icon-prepend"></i>
+                                        Añadir a la lista
+                                    </button>
+                                </div>
+                            </div>*@
                     </div>
                 </section>
             </div>
@@ -101,6 +118,7 @@
                                             showCancelButton: false,
                                             confirmButtonText: "Ok"
                                         }).then((r) => {
+                                            Swal.close();
                                             location.reload();
                                         });
                                     },
@@ -110,6 +128,16 @@
                                             "No hemos encontrado la estancia",
                                             'error'
                                         );
+                                    },
+                                    beforeSend: function () {
+                                        Swal.fire({
+                                            title: 'Añadiendo...',
+                                            html: 'Se está creando la lista de la compra',
+                                            allowOutsideClick: false,
+                                            didOpen: () => {
+                                                Swal.showLoading();
+                                            }
+                                        });
                                     }
                                 });
                             },

@@ -24,7 +24,8 @@ namespace Back.Controllers
         public async Task<IActionResult> Index()
         {
             // en la pagina de inicio se muestran las ultimas 5 listas de la compra
-            List<ShoppingList> lastShoppingLists = db.ShoppingList.Include(s => s.ListProducts).ThenInclude(s => s.Product).Include(s => s.Supermarket).Where(s => !s.IsDeleted).OrderByDescending(s => s.CreateDate).Take(5).ToList();
+            List<ShoppingList> lastShoppingLists = db.ShoppingList.Include(s => s.ListProducts).ThenInclude(s => s.Product).Include(s => s.Supermarket)
+                .Where(s => !s.IsDeleted).OrderByDescending(s => s.CreateDate).Take(5).ToList();
 
             return View(lastShoppingLists);
         }
@@ -46,6 +47,15 @@ namespace Back.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(int id)
         {
+            // desactivar el resto de listas de la compra de este super
+            ShoppingList deactivateShoppingList = db.ShoppingList.Where(s => s.Supermarket.Id == id && s.Active && !s.IsDeleted).FirstOrDefault();
+            deactivateShoppingList.Active = false;
+
+            db.ShoppingList.Update(deactivateShoppingList);
+            db.SaveChanges();
+
+            // crear nueva lista de la compra
+
             ShoppingList myShoppingList = new ShoppingList();
             myShoppingList.Supermarket = db.Supermarket.Find(id);
             myShoppingList.Code = GenerateCode(myShoppingList.Supermarket.Name);
